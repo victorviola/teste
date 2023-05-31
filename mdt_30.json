@@ -1,0 +1,1913 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ModelDataApi",
+    "description": "<b>You can test our interface on <a href=\"/Swagger/Index.html\" target=\"_blank\">Swagger</a></b><br><b>You can explore our interface on <a href=\"/api-docs/Index.html\" target=\"_blank\">Redoc</a></b><br>\n<h3>Additional Remarks</h3>\n\n<details>\n<summary>ModelDataApi-Usage</summary>\n\nHow to use the ModelDataApi in the right way.\n\n1. \nThe basic call should be \"api/CountryList\" to get all possible countries, which are currently provided.\nThis step is optional, if the client knows which country is relevant for him.\nThe country API should be called at least once to get the data for the relevant country, because all APIs require the data.\n\n2.\nThe next step is the \"api/EngineList\" which provides the overview of available vehicle (basic information like MDT-Code, DataSource, Description, UpdateStatus and more) for the given timespan.\nWithout timespan the API delivers all data.\n\nPossible scenarios:\n2.1 The client can call the API everytime without timespan for a full-load (eg. for initialization of client data status)\n2.2 The client can call the API after an initial run (2.1) with the timestamp of the last update, so the API will give only the delta since the last run.\n\nThere are plans to provide a bulk file in future. Further details will be announced depending on timeline and priorities.\n\n3.\nThe last step is the detailled call for the vehicle data. We offer multiple ways to load the Details.\n\nPossible scenarios:\n3.1 The \"api/Engine\" returns a single vehicle details response for given MDT-Code.\n3.2 The \"api/Engine/GetList\" returns multiple vehicle details response for given list of MDT-Codes (max. 50 per request). \n3.3 The \"api/Engine/GetByKey\" is provided for search by different Keys, which are provided by the ModelDataApi. (more information see chapter \"MDT-Keys\")\n\n</details>\n\n<details>\n<summary>MDT-Keys</summary>\n\n<p>\nThe ModelDataApi Data has its own partially qualified Primary Key: <b>MDT-Code</b>.\nThis is helpful to identify the superior hierarchies and the primary Search Argument.\nBesides there are multiple Foreign Keys which are basically for a universal search, like: <b>Okapi / Jato / MBV / FSAG-Key / SCHWACKE</b>\n\nDetails to the MDT-Code:\n- The MDT-Code is written in uppercase\n- Points and whitespaces are replaced by underscores\n- Quotes and quotation marks are removed\n\n<b>MDT-Code for Jato:</b><br>\nCOUNTRY.SOURCE.BRAND.CARLINEGROUP.CARLINE.MODELYEAR.VARIANT.{JATOCODE OF ENGINE WITHOUT TIMESTAMP AND RESEARCH STATUS}<br>\n1.......2......3.....4............5.......6.........7.......8\n\nEXAMPLE:\nDE.JATO.AUDI.A4.ES.2022.ALLROAD_QUATTRO.769046\n1..2....3....4..5..6....7...............8\n\n<b>MDT-Code for Okapi:</b><br>\nCOUNTRY.SOURCE.BRAND.CARLINEGROUP.CARLINE.MODELYEAR.VARIANT.{6-DIGIT-MBV-CODE}-{VERSION}-{EXTENSIONS-HASH}<br>\n1.......2......3.....4............5.......6.........7.......8..................9.........10\n\nEXAMPLE with Extensions:<br>\nDE.OKAPI.50000.50402.50344.2022.AMBITION.BA240C-1-8042F065868B3A5F668425140384A8CD (Hash from OKAPI-Code)<br>\n1..2.....3.....4.....5.....6....7........8......9.10\n\nEXAMPLE without Extensions:<br>\nDE.OKAPI.50000.50402.50344.2022.AMBITION.BA240C-1<br>\n1..2.....3.....4.....5.....6....7........8......9\n\n<b>MDT-Code for superior hierarchies:</b><br>\nVariant:      DE.JATO.AUDI.A4.ES.2022.ALLROAD QUATTRO<br>\nCarline:      DE.JATO.AUDI.A4.ES.2022<br>\nCarlineGroup: DE.JATO.AUDI.A4<br>\nMake:         DE.JATO.AUDI<br>\n\n<b>Foreign Keys:</b>\n\n<table>\n<tr>\n    <th>Type</th>\n    <th>Key</th>\n    <th>Source</th>\n\t<th>Comment</th>\n  </tr>\n   <tr>\n    <td>-</td>\n    <td>-</td>\n    <td>-</td>\n\t<td>-</td>\n  </tr>\n     <tr>\n    <td>MDT</td>\n    <td>DE.JATO.AUDI.A4 ALLROAD QUATTRO.2022.769046</td>\n    <td>jato</td>\n\t<td>-</td>\n  </tr>\n   <tr>\n    <td>MDT</td>\n    <td>DE.OKAPI.50000.50402.50344.2022.AMBITION.BA240C-1</td>\n    <td>okapi</td>\n\t<td>-</td>\n  </tr>\n  <tr>\n    <td>JATO</td>\n    <td>769046220220207</td>\n    <td>jato</td>\n\t<td>-</td>\n  </tr>\n  <tr>\n    <td>OKAPI</td>\n    <td>TYPE:3H93LZ-GYOSYOS-GYTZYTZ</td>\n    <td>okapi</td>\n\t<td>-</td>\n  </tr>\n  <tr>\n    <td>MBV</td>\n    <td>50000$50402$2022$3H93LZ0GYOSYOS GYTZYTZ</td>\n    <td>okapi</td>\n\t<td>-</td>\n  </tr>\n  <tr>\n    <td>FSAGKEY</td>\n    <td>DE.002.002.LIM.001.000.000.01968.150.4.A.DS.D.A.S.01428.04762.02820.02160.2022.014</td>\n    <td>jato</td>\n\t<td>Only for FleetQuotation</td>\n  </tr>\n  <tr>\n    <td>SCHWACKE</td>\n    <td>123456788</td>\n    <td>jato</td>\n\t<td>-</td>\n  </tr>\n</table>\n\n</details>",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/AliveCheck": {
+      "get": {
+        "tags": [
+          "AliveCheck"
+        ],
+        "summary": "HealthCheck for AliveCheck Controller.",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get Heart Beat for Azure succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/CountryList": {
+      "get": {
+        "tags": [
+          "CountryList"
+        ],
+        "summary": "Returns a list of all available countries and languages in MDT.",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get country list finished succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Country"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No countries found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Download/GetFullCatalog": {
+      "get": {
+        "tags": [
+          "Download"
+        ],
+        "summary": "Returns a full vehicle catalog from MDT.",
+        "description": "In case the file was not already created today, the last known full catalog is returned.\r\n            Normally the full catalog files are created from 4 a.m. to 6 a.m. UTC.",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "The Country Code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "languageCode",
+            "in": "query",
+            "description": "The Language Code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get zip file finished succesfully.",
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleContainerList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleContainerList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No zip file found.",
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Download/GetIncrementalCatalog": {
+      "get": {
+        "tags": [
+          "Download"
+        ],
+        "summary": "Returns an incremental vehicle catalog from MDT.",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "The Country Code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "languageCode",
+            "in": "query",
+            "description": "The Language Code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "referenceDate",
+            "in": "query",
+            "description": "The reference DateTime.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get zip file finished succesfully.",
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleContainerList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleContainerList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No zip file found.",
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/Engine": {
+      "get": {
+        "tags": [
+          "Engine"
+        ],
+        "summary": "Gets a distinct engine for the given parameters.",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "The country code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "languageCode",
+            "in": "query",
+            "description": "The language code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mdtCode",
+            "in": "query",
+            "description": "The MDT code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get engine finished succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineVehicleContainer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No engine found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Engine expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "400": {
+            "description": "Parameters are not valid."
+          }
+        }
+      }
+    },
+    "/api/Engine/GetByKey": {
+      "get": {
+        "tags": [
+          "Engine"
+        ],
+        "summary": "Gets a distinct engine for the given parameters by key search.",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "The country code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "languageCode",
+            "in": "query",
+            "description": "The language code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keyValue",
+            "in": "query",
+            "description": "The code, which is defined by the KeyTypes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keyType",
+            "in": "query",
+            "description": "The key type, which can be the FSAG-Key or Schwacke.",
+            "schema": {
+              "$ref": "#/components/schemas/KeyTypes"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get engine finished succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineVehicleContainer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No engine found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Engine expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "400": {
+            "description": "Parameters are not valid."
+          }
+        }
+      }
+    },
+    "/api/Engine/GetList": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "summary": "Gets the engines for the given parameters. The Mdt Codes are limited to 50 per Request, otherwise there will be an Http Error Code 429.",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The list of MDT codes. You can specify up to 50 codes.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetEnginesRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetEnginesRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetEnginesRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetEnginesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get engine finished succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleContainerList"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "400": {
+            "description": "Parameters are not valid."
+          },
+          "429": {
+            "description": "Limit on Engines once per call."
+          }
+        }
+      }
+    },
+    "/api/EngineList": {
+      "get": {
+        "tags": [
+          "EngineList"
+        ],
+        "summary": "Get a list of all engines for the given country and language.",
+        "description": "By setting referenceDate, you will get an incremental update with all new, changed and deleted engines from the reference date on.\r\nThe time span between today and the referenceDate must not exceed one month.",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "The country code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "languageCode",
+            "in": "query",
+            "description": "The language code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "referenceDate",
+            "in": "query",
+            "description": "The reference date (optional).",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get engine list finished succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineListContainer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No engines found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The time span between today and the referenceDate must not exceed one month and must be in the past.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/ModelSearch/SearchValues": {
+      "post": {
+        "tags": [
+          "ModelSearch"
+        ],
+        "summary": "The get search values action",
+        "requestBody": {
+          "description": "The VWFS.ModelDataTool.Contracts.ModelSearch.SearchRequest.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get search value response succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchValueResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ModelSearch/SearchResult": {
+      "post": {
+        "tags": [
+          "ModelSearch"
+        ],
+        "summary": "The get search result action.",
+        "requestBody": {
+          "description": "The VWFS.ModelDataTool.Contracts.ModelSearch.SearchRequest.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get search result succesfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ResolveLegacy": {
+      "get": {
+        "tags": [
+          "ResolveLegacy"
+        ],
+        "summary": "Returns the MDT code for any legacy code.",
+        "parameters": [
+          {
+            "name": "legacyCode",
+            "in": "query",
+            "description": "The legacy code.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get mdt code for a legacy code.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "MDT-Code not found."
+          },
+          "403": {
+            "description": "Api Key required"
+          },
+          "401": {
+            "description": "Invalid Api Key"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "400": {
+            "description": "Parameters are not valid."
+          },
+          "417": {
+            "description": "Exception occured."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "errorMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "errorDetails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Carline": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "modelYear": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "mdtCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Variant"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CarlineGroup": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "mdtCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Country": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "languageCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Engine": {
+        "type": "object",
+        "properties": {
+          "hashValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "mdtCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "languageCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "keys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Key"
+            }
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          },
+          "priceGross": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "priceNet": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Part"
+            }
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rule"
+            }
+          },
+          "isResearchStatus": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "lastUpdate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "level": {
+            "$ref": "#/components/schemas/VehicleHierarchy"
+          },
+          "engineGroup": {
+            "type": "string",
+            "nullable": true
+          },
+          "engineFuelType": {
+            "type": "string",
+            "nullable": true
+          },
+          "powerHp": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "powerKw": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cubicCapacity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cubicCapacityUnit": {
+            "type": "string",
+            "nullable": true
+          },
+          "co2EmissionCombinedMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "co2EmissionCombinedMax": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "consumptionCombinedMin": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "consumptionCombinedMax": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "powerHpUnit": {
+            "type": "string",
+            "nullable": true
+          },
+          "powerKwUnit": {
+            "type": "string",
+            "nullable": true
+          },
+          "co2EmissionCombinedUnit": {
+            "type": "string",
+            "nullable": true
+          },
+          "consumptionCombinedUnit": {
+            "type": "string",
+            "nullable": true
+          },
+          "numbersOfDoors": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "gearTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "efficiencyClasses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EngineListContainer": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "languageCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "referenceDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "engines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EngineListItem"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EngineListItem": {
+        "type": "object",
+        "properties": {
+          "lastUpdate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdateLong": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "dataSource": {
+            "type": "string",
+            "nullable": true
+          },
+          "makeDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineGroupDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "variant": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "mdtCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          },
+          "updateStatus": {
+            "$ref": "#/components/schemas/UpdateStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EngineVehicleContainer": {
+        "type": "object",
+        "properties": {
+          "dataType": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataSource": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastUpdate": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastUpdateLong": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "languageCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "make": {
+            "$ref": "#/components/schemas/Make"
+          },
+          "carlineGroup": {
+            "$ref": "#/components/schemas/CarlineGroup"
+          },
+          "carline": {
+            "$ref": "#/components/schemas/Carline"
+          },
+          "variant": {
+            "$ref": "#/components/schemas/Variant"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Engine"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetEnginesRequest": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "description": "Gets or sets the country code.",
+            "nullable": true,
+            "example": "DE"
+          },
+          "languageCode": {
+            "type": "string",
+            "description": "Gets or sets the language code.",
+            "nullable": true,
+            "example": "de"
+          },
+          "mdtCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the MDT codes.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Wrapping String Array for requesting multiple Engines at once."
+      },
+      "Key": {
+        "type": "object",
+        "properties": {
+          "keyValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "keyType": {
+            "$ref": "#/components/schemas/KeyTypes"
+          },
+          "hitRate": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "valid": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "KeyTypes": {
+        "enum": [
+          "Undefined",
+          "MDT",
+          "JATO",
+          "OKAPI",
+          "MBV",
+          "FSAGKEY",
+          "SCHWACKE",
+          "HSNTSN"
+        ],
+        "type": "string"
+      },
+      "Make": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "mdtCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PackagePart": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/PartTypes"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "partFamily": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "compatibilityKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Part": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/PartTypes"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "partFamily": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "compatibilityKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "priceGross": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "priceNet": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "isVisible": {
+            "type": "boolean"
+          },
+          "isStandard": {
+            "type": "boolean"
+          },
+          "isPackage": {
+            "type": "boolean"
+          },
+          "isDiscountable": {
+            "type": "boolean"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "packageContent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PackagePart"
+            }
+          },
+          "headlines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PartTypes": {
+        "enum": [
+          "Option",
+          "ExteriorColor",
+          "InteriorColor"
+        ],
+        "type": "string"
+      },
+      "Rule": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "ruleCondition": {
+            "type": "string",
+            "nullable": true
+          },
+          "ruleConstraint": {
+            "type": "string",
+            "nullable": true
+          },
+          "discountNet": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "discountGross": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "partNumbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "ruleType": {
+            "$ref": "#/components/schemas/RuleTypes"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RuleTypes": {
+        "enum": [
+          "Unknown",
+          "Includes",
+          "Requires",
+          "Excludes",
+          "Price",
+          "Discount",
+          "Toggle"
+        ],
+        "type": "string"
+      },
+      "SearchEntryStatus": {
+        "enum": [
+          "Undefined",
+          "Current",
+          "Expired",
+          "InResearch"
+        ],
+        "type": "string"
+      },
+      "SearchRequest": {
+        "type": "object",
+        "properties": {
+          "mdtCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "$ref": "#/components/schemas/VehicleHierarchy"
+          },
+          "dataSource": {
+            "type": "string",
+            "nullable": true
+          },
+          "hashValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "makeCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineGroupCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "variantCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "engineType": {
+            "type": "string",
+            "nullable": true
+          },
+          "gearType": {
+            "type": "string",
+            "nullable": true
+          },
+          "bodyType": {
+            "type": "string",
+            "nullable": true
+          },
+          "doors": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "hsn": {
+            "type": "string",
+            "nullable": true
+          },
+          "tsn": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "jatoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "datEuroCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "datCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "datEuroExt": {
+            "type": "string",
+            "nullable": true
+          },
+          "minHp": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxHp": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "minKw": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxKw": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "minConsumption": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "maxConsumption": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "minCapacity": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxCapacity": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "minPriceNet": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "maxPriceNet": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "minPriceGross": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "maxPriceGross": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "minEmission": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxEmission": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "makeDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineGroupDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "variantDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "makeForeignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineGroupForeignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "carlineForeignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "variantForeignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/SearchEntryStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchResult": {
+        "type": "object",
+        "properties": {
+          "engines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResultEngine"
+            },
+            "description": "Gets or sets the list of Engines",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The search response."
+      },
+      "SearchResultEngine": {
+        "type": "object",
+        "properties": {
+          "mdtCode": {
+            "type": "string",
+            "description": "Gets or sets the mdt code.",
+            "nullable": true
+          },
+          "makeDescription": {
+            "type": "string",
+            "description": "Gets or sets the make description.",
+            "nullable": true
+          },
+          "carlineGroupDescription": {
+            "type": "string",
+            "description": "Gets or sets the carline group description.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Gets or sets the description.",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "description": "Gets or sets the code.",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "description": "Gets or sets the year.",
+            "format": "int32",
+            "nullable": true
+          },
+          "priceNet": {
+            "type": "number",
+            "description": "Gets or sets the price net.",
+            "format": "decimal",
+            "nullable": true
+          },
+          "priceGross": {
+            "type": "number",
+            "description": "Gets or sets the price gross.",
+            "format": "decimal",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The search response engine."
+      },
+      "SearchResultEntity": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Gets or sets the code.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Gets or sets the description.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The search response entity (make, carlinegroup, ....)"
+      },
+      "SearchValueResponse": {
+        "type": "object",
+        "properties": {
+          "engineCount": {
+            "type": "integer",
+            "description": "Gets or sets the engine count.",
+            "format": "int32"
+          },
+          "makes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResultEntity"
+            },
+            "description": "Gets or sets the makes.",
+            "nullable": true
+          },
+          "carlineGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResultEntity"
+            },
+            "description": "Gets or sets the carline groups.",
+            "nullable": true
+          },
+          "carlines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResultEntity"
+            },
+            "description": "Gets or sets the carlines.",
+            "nullable": true
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResultEntity"
+            },
+            "description": "Gets or sets the variant text.",
+            "nullable": true
+          },
+          "hsn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the HSN.",
+            "nullable": true
+          },
+          "tsn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the tsn.",
+            "nullable": true
+          },
+          "years": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the years.",
+            "nullable": true
+          },
+          "doors": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the doors.",
+            "nullable": true
+          },
+          "engineTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the types of the engine.",
+            "nullable": true
+          },
+          "gearTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the types of the gear.",
+            "nullable": true
+          },
+          "bodyTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Gets or sets the types of the body.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The search value response containing distinct search options."
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "valueDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagScopes"
+            },
+            "nullable": true
+          },
+          "valueType": {
+            "$ref": "#/components/schemas/TagValueTypes"
+          },
+          "dataSource": {
+            "type": "string",
+            "nullable": true
+          },
+          "isInvalid": {
+            "type": "boolean"
+          },
+          "originatingPartCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TagScopes": {
+        "enum": [
+          "Info",
+          "TechnicalOverview",
+          "EmissionsAndConsumptions"
+        ],
+        "type": "string"
+      },
+      "TagValueTypes": {
+        "enum": [
+          "Undefined",
+          "String",
+          "Decimal",
+          "Integer",
+          "Boolean",
+          "Enum"
+        ],
+        "type": "string"
+      },
+      "UpdateStatus": {
+        "enum": [
+          "Undefined",
+          "New",
+          "Changed",
+          "InResearch",
+          "Current",
+          "Expired"
+        ],
+        "type": "string"
+      },
+      "Variant": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "foreignCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "mdtCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VehicleContainerList": {
+        "type": "object",
+        "properties": {
+          "engineList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleContainerListItem"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "VehicleContainerListItem": {
+        "type": "object",
+        "properties": {
+          "mdtCode": {
+            "type": "string"
+          },
+          "vehicleContainer": {
+            "$ref": "#/components/schemas/EngineVehicleContainer"
+          },
+          "errorMessage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VehicleHierarchy": {
+        "enum": [
+          "Undefined",
+          "Engine",
+          "Variant",
+          "Carline",
+          "CarlineGroup",
+          "Make",
+          "DataSource",
+          "Country",
+          "Root"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "description": "Standard Authorization header using the ApiKey scheme.",
+        "name": "X-API-KEY",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKey": [ ]
+    }
+  ]
+}
